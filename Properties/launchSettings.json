@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NuGet.Quality": {
+      "commandName": "Project",
+      "commandLineArgs": "--package-id Newtonsoft.Json --package-version 12.0.3"
+    }
+  }
+}
