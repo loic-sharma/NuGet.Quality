@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
@@ -74,15 +73,16 @@ namespace NuGet.Quality
     {
         public override void Validate(ValidationContext ctx)
         {
-            var items = new HashSet<string>(ctx.PackageReader.GetLibItems().SelectMany(g => g.Items));
+            var items = new HashSet<string>(
+                ctx.PackageReader.GetLibItems().SelectMany(g => g.Items),
+                StringComparer.OrdinalIgnoreCase);
 
             foreach (var item in items)
             {
-                if (Path.GetExtension(item).ToLowerInvariant() != ".dll") continue;
+                if (!Path.GetExtension(item).Equals(".dll", StringComparison.OrdinalIgnoreCase)) continue;
 
                 // The current file is an assembly. It should have a corresponding XML documentation file.
-                // TODO: Is the "/" the right thing to use here? Can a NuGet package use "\"?
-                if (!items.Contains(Path.GetDirectoryName(item) + "/" + Path.GetFileNameWithoutExtension(item) + ".xml"))
+                if (!items.Contains(Path.ChangeExtension(item, "xml")))
                 {
                     ctx.Messages.Add("The package is missing XML documentation!");
                     return;
