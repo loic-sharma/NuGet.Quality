@@ -41,10 +41,15 @@ namespace NuGet.Quality
                 if (entry.Type != DebugDirectoryEntryType.PdbChecksum) continue;
 
                 var data = peReader.ReadPdbChecksumDebugDirectoryData(entry);
-                var algorithm = data.AlgorithmName;
-                var checksum = data.Checksum.Select(b => b.ToString("x2"));
-
-                checksums.Add($"{algorithm}:{checksum}");
+                var builder = new StringBuilder();
+                builder.Append(algorithm);
+                builder.Append(':');
+                foreach (var bytes in data.Checksum)
+                {
+                    builder.Append(bytes.ToString("x2"));
+                    
+                }
+                checksums.Add(builder.ToString());
             }
 
             foreach (var entry in peReader.ReadDebugDirectory())
